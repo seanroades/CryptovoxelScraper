@@ -15,19 +15,11 @@ const puppeteer = require('puppeteer');
     for (i = 0; i <= 50000; i = i + 5000) {
       await page.evaluate(`window.scrollTo(0, ${i})`);
       await page.waitForTimeout(5000 + (i * 0.15));
-      console.log("In test round i: ", i)
     }
-
-    console.log("looking at sorting prices/titles")
-
     const prices = await page.$$eval('div[class="Pricereact__DivContainer-t54vn5-0 lfnLj Price--main Asset--price-amount"] > div', anchors => { return anchors.map(anchor => anchor.textContent) })
     const titles = await page.$$eval('div.Asset--name', anchors => { return anchors.map(anchor => anchor.textContent) })
 
-    console.log('prices and titles done')
-
     await browser.close()
-
-    console.log("creating csv")
 
     const createCsvWriter = require('csv-writer').createObjectCsvWriter;
     const csvWriter = createCsvWriter({
@@ -40,16 +32,12 @@ const puppeteer = require('puppeteer');
 
     const records = [];
 
-    console.log('prices length: ', prices.length, 'titles length: ', titles.length);
-
     for (var i = 0; i < titles.length; i++) {
         records.push({
             assetName: titles[i],
             assetPrice: prices[i]
         })
     }
-
-    console.log('exiting forloop')
     
     csvWriter.writeRecords(records)
         .then(() => {
